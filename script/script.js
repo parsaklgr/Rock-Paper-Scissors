@@ -4,8 +4,6 @@ function computerPlay() {
     return Moves[randomIndex];
 }
 
-
-
 function playOneRound(playerSelection, computerSelection) {
     let ps = playerSelection.toLowerCase();
     let cs = computerSelection.toLowerCase();
@@ -50,13 +48,51 @@ function playOneRound(playerSelection, computerSelection) {
     }
 }
 
-function game() {
-    for (let i = 0; i < 5; i++){
-        let cs = computerPlay();
-        let ps = prompt("input your move!");
-        let result = playOneRound(ps, cs);
-        console.log(result);
-    }
+const container = document.querySelector("#container");
+const display = document.createElement("div");
+container.appendChild(display);
+let rounds = 0; 
+let roundsWon = 0;
+
+function buttonListener() {
+    let returnedRounds =
+        displayResult(playOneRound(this.textContent, computerPlay()), rounds, roundsWon);
+    rounds = returnedRounds["rounds_"];
+    roundsWon = returnedRounds["roundsWon_"];
+};
+
+function removeEventListeners() {
+    const buttons = document.querySelectorAll("button");
+    buttons.forEach(button => {
+        button.removeEventListener("click", buttonListener);
+    });
 }
 
-game();
+function displayResult(result, rounds_, roundsWon_) {
+    rounds_ = rounds_ + 1;
+    if (/^(You Win!)/.test(result)) {
+        roundsWon_ = roundsWon_ + 1;
+    }
+    let displaycontent = `${result}`;
+    displaycontent = displaycontent + ` rounds won: ${roundsWon_
+}`;
+    displaycontent = displaycontent + ` rounds played: ${rounds_
+        }`;
+    if (roundsWon_ === 5) {
+        displaycontent = displaycontent + " Ultimate Winner: You";
+        removeEventListeners();
+    } else if (rounds_ - roundsWon_ === 5) {
+        displaycontent = displaycontent + " Ultimate Winner: Computer";
+        removeEventListeners();
+    }
+    display.textContent = displaycontent;
+    return { "rounds_": rounds_, "roundsWon_": roundsWon_ };
+}
+
+let buttonTexts = ["Rock", "Paper", "Scissors"];
+for (let bT of buttonTexts) {
+    const button = document.createElement("button");
+    button.textContent = bT;
+    button.addEventListener("click", buttonListener);
+    container.appendChild(button);
+}
